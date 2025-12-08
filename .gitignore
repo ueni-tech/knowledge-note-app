@@ -1,0 +1,107 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+*.lcov
+.nyc_output
+
+# Next.js
+/.next/
+/out/
+build/
+dist/
+.next
+*.tsbuildinfo
+next-env.d.ts
+
+# Nest.js
+dist/
+build/
+*.js.map
+*.d.ts.map
+
+# Production
+/build
+/.next
+/out
+
+# Misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+lerna-debug.log*
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+.temp/
+
+# AI/ML related (if using local models)
+models/
+*.model
+*.bin
+*.pt
+*.pth
+*.h5
+*.ckpt
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads and user content (if storing locally)
+uploads/
+public/uploads/
+temp/
+
