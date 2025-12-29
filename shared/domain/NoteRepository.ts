@@ -6,7 +6,7 @@ import type { Note, NoteId } from "./Note";
  */
 export interface NoteRepository {
   save(note: Note): Promise<void>;
-  findAll(): Promise<void>;
+  findAll(): Promise<Note[]>;
   findById(id: NoteId): Promise<Note | null>;
   searchByText(query: string): Promise<Note[]>;
 }
