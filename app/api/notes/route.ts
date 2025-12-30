@@ -1,0 +1,65 @@
+import { NoteService } from "../../../shared/domain/NoteService";
+import { InMemoryNoteRepository } from "../../../shared/infrastructure/InMemoryNoteRepository";
+import type { Note } from "../../../shared/domain/Note";
+import { NextResponse } from "next/server";
+
+type NoteDto = {
+  id: string;
+  title: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function toDto(note: Note): NoteDto {
+  return {
+    id: note.id,
+    title: note.title,
+    body: note.body,
+    createdAt: note.createdAt.toISOString(),
+    updatedAt: note.updatedAt.toISOString(),
+  };
+}
+
+// 同一プロセス内だけで保持する（サーバ再起動で消える）
+const repo = new InMemoryNoteRepository();
+const service = new NoteService(repo);
+
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q") ?? "";
+
+  const notes =
+    q.trim().length === 0 ? await service.list() : await service.search(q);
+  return NextResponse.json(notes.map(toDto));
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as unknown;
+    if (typeof body !== "object" || body === null) {
+      return NextResponse.json(
+        { error: "リクエストボディが不正です" },
+        { status: 400 }
+      );
+    }
+
+    const { title, body: noteBody } = body as {
+      title?: unknown;
+      body?: unknown;
+    };
+
+    if (typeof title !== "string" || typeof noteBody !== "string") {
+      return NextResponse.json(
+        { error: "title/body は文字列で指定してください" },
+        { status: 400 }
+      );
+    }
+
+    const note = await service.create({ title, body: noteBody });
+    return NextResponse.json(toDto(note), { status: 201 });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "不明なエラー";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+}
