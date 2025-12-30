@@ -9,4 +9,7 @@
   - Note(domain)は保存方法を知らない
   - Note(domain)にNoteを生成するルールが明記されている
   - NoteServiceのcreateの内部ではNoteで定義された静的メソッドcreateが実行される
-
+  - NoteServiceは窓口かつ前処理係。NoteRepositoryは作業係。NoteServiceはどこに作業を依頼できるかを知っていればよい
+  - 依存の向き
+    - OK: app/ → `NoteService` → `NoteRepository` → 実装
+    - NG: domain → app/ (ドメインがapp/に依存してはいけない)
