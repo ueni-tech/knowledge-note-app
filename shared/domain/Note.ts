@@ -25,7 +25,8 @@ export class Note {
 
     if (title.length === 0) throw new Error("タイトルは必須です");
     if (body.length === 0) throw new Error("本文は必須です");
-    if (title.length > 100) throw new Error("タイトルは100字未満です");
+    if (title.length > 100) throw new Error("タイトルは100文字以内です");
+    if (body.length > 2000) throw new Error("本文は2000文字以内です");
 
     const now = params.now ?? new Date();
     const idFactory = params.idFactory ?? defaultIdFactory;

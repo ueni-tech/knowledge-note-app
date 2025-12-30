@@ -20,7 +20,7 @@ export class NoteService {
 
   async search(query: string): Promise<Note[]> {
     const q = query.trim();
-    if (q.length === 0) return [];
+    if (q.length < 2) return [];
     return await this.repo.searchByText(q);
   }
 }
