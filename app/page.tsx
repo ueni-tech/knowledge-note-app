@@ -11,9 +11,12 @@ type NoteDto = {
   updatedAt: string;
 };
 
-async function fetchNotes(q: string): Promise<NoteDto[]> {
+type SearchTarget = "all" | "title" | "body";
+
+async function fetchNotes(q: string, target: SearchTarget): Promise<NoteDto[]> {
   const params = new URLSearchParams();
   if (q.trim().length > 0) params.set("q", q);
+  params.set("target", target)
 
   const qs = params.toString();
   const url = qs.length > 0 ? `/api/notes?${qs}` : "/api/notes";
@@ -25,6 +28,7 @@ async function fetchNotes(q: string): Promise<NoteDto[]> {
 
 export default function Page() {
   const [q, setQ] = useState("");
+  const [target, setTarget] = useState<SearchTarget>("all");
   const [notes, setNotes] = useState<NoteDto[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -33,14 +37,14 @@ export default function Page() {
     const trimmed = q.trim();
     if (trimmed.length === 0) return "一覧を表示中";
     if (trimmed.length < 2) return "検索は2文字以上で有効";
-    return `検索中: "${trimmed}"`;
-  }, [q]);
+    return `検索中: "${trimmed}" （target=${target}）`;
+  }, [q, target]);
 
-  async function load(nextQ: string) {
+  async function load(nextQ: string, nextTarget: SearchTarget) {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchNotes(nextQ);
+      const data = await fetchNotes(nextQ, nextTarget);
       setNotes(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "不明なエラー");
@@ -50,7 +54,7 @@ export default function Page() {
   }
 
   useEffect(() => {
-    void load("")
+    void load("", "all")
   }, []);
 
   return (
@@ -63,10 +67,42 @@ export default function Page() {
 
       <section style={{ marginTop: 16 }}>
         <h2>検索</h2>
+        <div style={{ display: "flex", gap: 12, marginBottom: 8 }}>
+          <label>
+            <input
+              type="radio"
+              name="target"
+              value="all"
+              checked={target === "all"}
+              onChange={() => setTarget("all")}
+            />
+            all
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="target"
+              value="title"
+              checked={target === "title"}
+              onChange={() => setTarget("title")}
+            />
+            title
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="target"
+              value="body"
+              checked={target === "body"}
+              onChange={() => setTarget("body")}
+            />
+            body
+          </label>
+        </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            void load(q);
+            void load(q, target);
           }}
           style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <input
@@ -82,13 +118,14 @@ export default function Page() {
             type="button"
             onClick={() => {
               setQ("");
-              void load("");
+              void load("", target);
             }}
             disabled={loading}
           >
             クリア
           </button>
         </form>
+
         <p style={{ color: "#555", marginTop: 8 }}>{hint}</p>
       </section>
 

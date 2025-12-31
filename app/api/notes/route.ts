@@ -29,9 +29,35 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q") ?? "";
 
-  const notes =
-    q.trim().length === 0 ? await service.list() : await service.search(q);
-  return NextResponse.json(notes.map(toDto));
+  const rawTarget = url.searchParams.get("target") ?? "all";
+  const target =
+    rawTarget === "title" || rawTarget === "body" || rawTarget === "all"
+      ? rawTarget
+      : "all";
+
+  if (q.trim().length === 0) {
+    const notes = await service.list();
+    return NextResponse.json(notes.map(toDto));
+  }
+
+  if (q.trim().length < 2) {
+    return NextResponse.json([]);
+  }
+
+  if (target === "all") {
+    const notes = await service.search(q);
+    return NextResponse.json(notes.map(toDto));
+  }
+
+  const notes = await service.list();
+  const qq = q.trim().toLowerCase();
+
+  const filtered = notes.filter((n) => {
+    if (target === "title") return n.title.toLowerCase().includes(qq);
+    return n.body.toLowerCase().includes(qq);
+  });
+
+  return NextResponse.json(filtered.map(toDto));
 }
 
 export async function POST(request: Request) {
@@ -39,8 +65,12 @@ export async function POST(request: Request) {
     const body = (await request.json()) as unknown;
     if (typeof body !== "object" || body === null) {
       return NextResponse.json(
-        { error: "リクエストボディが不正です" },
-        { status: 400 }
+        {
+          error: "リクエストボディが不正です",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
@@ -51,15 +81,31 @@ export async function POST(request: Request) {
 
     if (typeof title !== "string" || typeof noteBody !== "string") {
       return NextResponse.json(
-        { error: "title/body は文字列で指定してください" },
-        { status: 400 }
+        {
+          error: "title/body は文字列で指定してください",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
-    const note = await service.create({ title, body: noteBody });
-    return NextResponse.json(toDto(note), { status: 201 });
+    const note = await service.create({
+      title,
+      body: noteBody,
+    });
+    return NextResponse.json(toDto(note), {
+      status: 201,
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : "不明なエラー";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: message,
+      },
+      {
+        status: 400,
+      }
+    );
   }
 }
