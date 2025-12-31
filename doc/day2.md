@@ -392,6 +392,52 @@ npm run dev
   - `http://localhost:3000` で「一覧＋検索フォーム」が表示される
   - `+ 新規メモを作成` から `/new` に遷移できる
 
+### DevToolsでの調査（必須：Network / Console / Elements / Breakpoints）
+1回だけでいいので、必ずDevToolsで確認します（スクショは不要、結果をメモするだけでOK）。
+
+#### Network（APIが期待通りに呼ばれているか）
+- **操作**：
+  - ブラウザで `http://localhost:3000` を開く
+  - DevToolsを開き、**Network** タブを開く
+  - 一覧ページで「検索」ボタンを押す（クエリ空のままでもOK）
+  - 次に検索フォームへ `ab` のように2文字以上を入力して「検索」を押す
+- **見る観点**（対象リクエスト：`/api/notes`）：
+  - URL：`/api/notes` または `/api/notes?q=ab` になっている
+  - Method：GET
+  - Status：200
+  - Response：JSON配列が返っている（検索が1文字なら `[]` になるのも確認）
+- **期待結果**：
+  - 初回表示で `GET /api/notes` が飛ぶ
+  - 検索で `GET /api/notes?q=...` が飛ぶ
+
+#### Console（フロントのエラーが出ていないか）
+- **操作**：DevToolsの **Console** タブを開く
+- **見る観点**：
+  - 赤いエラーが出ていない
+  - Warningが大量に出ていない
+- **期待結果**：
+  - エラーが0件（もし出たら、メッセージをそのまま記録する）
+
+#### Elements（コンテナ/フォームのDOMが期待通りか）
+- **操作**：DevToolsの **Elements** タブで検索フォームの `<input>` を選択する（要素選択ツールでクリック）
+- **見る観点**：
+  - `placeholder` が「タイトル/本文を部分一致検索（2文字以上）」になっている
+  - ボタンが `type="submit"` になっている（検索ボタン）
+- **期待結果**：
+  - 「意図したDOMが画面に存在し、属性が期待通り」になっている
+
+#### Breakpoints（“どこで状態が変わって画面が更新されるか”を追う）
+- **操作**：
+  - DevToolsの **Sources** タブを開く
+  - `app/page.tsx` の `load()`（`setNotes(data)` の行）にブレークポイントを置く
+  - 一覧ページで検索ボタンを押す
+- **見る観点**：
+  - `nextQ` に何が入っているか
+  - `data`（APIレスポンス）が期待通りか
+  - `setNotes(data)` の後に画面表示が変わること
+- **期待結果**：
+  - 「fetch→data取得→setNotes→再描画」の流れを自分の目で追える
+
 ### `curl` で API 確認（GET/POST/検索）
 別ターミナルで実行（URLは環境に合わせて変えてOK）。
 
@@ -441,6 +487,7 @@ curl -s "http://localhost:3000/api/notes?q=a" | jq .
 - **課題A**：検索を「titleだけ」「bodyだけ」で切り替えできるようにする（UIにラジオボタン追加 → APIに `target=title|body|all` 追加）
 - **課題B**：`InMemoryNoteRepository` の `findAll()` を「新しい順」ではなく「古い順」に変えて、UIで並びが変わることを確認する
 - **課題C**：POSTのバリデーション（title/bodyが空）で 400 が返るのを `curl` で確認し、エラーメッセージをUIに表示する
+- **課題D（DevTools復習）**：Networkで `POST /api/notes` を実際に発生させ、URL/Method/Status/Response を確認する（`/new` から作成ボタンを押す）
 
 ## 8. 今日の振り返りテンプレ（箇条書き3つ）
 - **今日できたこと**：
