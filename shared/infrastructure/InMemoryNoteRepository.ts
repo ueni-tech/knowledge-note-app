@@ -19,7 +19,7 @@ export class InMemoryNoteRepository implements NoteRepository {
 
   async findAll(): Promise<Note[]> {
     return [...this.notes].sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
     );
   }
 
