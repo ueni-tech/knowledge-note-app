@@ -7,6 +7,7 @@ type NoteDto = {
   id: string;
   title: string;
   body: string;
+  tags: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -16,6 +17,7 @@ function toDto(note: Note): NoteDto {
     id: note.id,
     title: note.title,
     body: note.body,
+    tags: note.tags,
     createdAt: note.createdAt.toISOString(),
     updatedAt: note.updatedAt.toISOString(),
   };
@@ -28,6 +30,7 @@ const service = new NoteService(repo);
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q") ?? "";
+  const tag = url.searchParams.get("tag") ?? "";
 
   const rawTarget = url.searchParams.get("target") ?? "all";
   const target =
@@ -35,29 +38,34 @@ export async function GET(request: Request) {
       ? rawTarget
       : "all";
 
-  if (q.trim().length === 0) {
+  const searchQuery: { text?: string; tag?: string } = {};
+  if (q.trim().length > 0) {
+    searchQuery.text = q;
+  }
+  if (tag.trim().length > 0) {
+    searchQuery.tag = tag;
+  }
+
+  if (Object.keys(searchQuery).length === 0) {
     const notes = await service.list();
     return NextResponse.json(notes.map(toDto));
   }
 
-  if (q.trim().length < 2) {
-    return NextResponse.json([]);
+  let notes = await service.search(searchQuery);
+
+  if (q.trim().length > 0 && target !== "all") {
+    const qLower = q.trim().toLowerCase();
+    notes = notes.filter((n) => {
+      if (target === "title") {
+        return n.title.toLowerCase().includes(qLower);
+      } else if (target === "body") {
+        return n.body.toLowerCase().includes(qLower);
+      }
+      return true;
+    });
   }
 
-  if (target === "all") {
-    const notes = await service.search(q);
-    return NextResponse.json(notes.map(toDto));
-  }
-
-  const notes = await service.list();
-  const qq = q.trim().toLowerCase();
-
-  const filtered = notes.filter((n) => {
-    if (target === "title") return n.title.toLowerCase().includes(qq);
-    return n.body.toLowerCase().includes(qq);
-  });
-
-  return NextResponse.json(filtered.map(toDto));
+  return NextResponse.json(notes.map(toDto));
 }
 
 export async function POST(request: Request) {
@@ -74,9 +82,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const { title, body: noteBody } = body as {
+    const {
+      title,
+      body: noteBody,
+      tags,
+    } = body as {
       title?: unknown;
       body?: unknown;
+      tags?: unknown;
     };
 
     if (typeof title !== "string" || typeof noteBody !== "string") {
@@ -90,9 +103,35 @@ export async function POST(request: Request) {
       );
     }
 
+    let tagsArray: string[] = [];
+    if (tags !== undefined) {
+      if (!Array.isArray(tags)) {
+        return NextResponse.json(
+          {
+            error: "tags は配列で指定してください",
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+      if (!tags.every((t) => typeof t === "string")) {
+        return NextResponse.json(
+          {
+            error: "tags の各要素は文字列で指定してください",
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+      tagsArray = tags;
+    }
+
     const note = await service.create({
       title,
       body: noteBody,
+      tags: tagsArray,
     });
     return NextResponse.json(toDto(note), {
       status: 201,

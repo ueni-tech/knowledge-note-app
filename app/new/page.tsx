@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-async function createNote(title: string, body: string): Promise<void> {
+async function createNote(title: string, body: string, tags: string[]): Promise<void> {
   const res = await fetch("/api/notes", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, body }),
+    body: JSON.stringify({ title, body, tags }),
   });
 
   if (!res.ok) {
@@ -21,6 +21,7 @@ export default function Page() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +30,8 @@ export default function Page() {
     setLoading(true);
     setError(null);
     try {
-      await createNote(title, body);
+      const tags = tagsInput.split(",").map((t) => t.trim()).filter((t) => t.length > 0);
+      await createNote(title, body, tags);
       router.push("/");
       router.refresh();
     } catch (e) {
@@ -68,7 +70,18 @@ export default function Page() {
           />
         </label>
 
-        {error ? <p style={{color: "crimson"}}>{error}</p> : null}
+        <label>
+          タグ（カンマ区切り）
+          <input
+            type="text"
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
+            placeholder="例: 技術,メモ,重要"
+            style={{ display: "block", width: "100%", padding: 8, marginTop: 6 }}
+          />
+        </label>
+
+        {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
 
         <button type="submit" disabled={loading}>
           {loading ? "作成中..." : "作成"}
