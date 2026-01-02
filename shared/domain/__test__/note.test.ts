@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { Note } from "../Note";
-import { NoteRepository } from "../NoteRepository";
+import { NoteRepository, SearchQuery } from "../NoteRepository";
 import { NoteService } from "../NoteService";
 
 const fixedNow = new Date("2025-01-01T00:00:00.000Z");
@@ -37,7 +37,7 @@ function createRepoMock(): NoteRepository {
     save: vi.fn(async () => {}),
     findAll: vi.fn(async () => []),
     findById: vi.fn(async () => null),
-    searchByText: vi.fn(async () => []),
+    search: vi.fn(async () => []),
   };
 }
 
@@ -46,28 +46,28 @@ describe("NoteService.search", () => {
     const repo = createRepoMock();
     const service = new NoteService(repo);
 
-    await expect(service.search("")).resolves.toEqual([]);
-    await expect(service.search("  ")).resolves.toEqual([]);
-    await expect(service.search("a")).resolves.toEqual([]);
-    await expect(service.search(" a ")).resolves.toEqual([]);
+    await expect(service.search({ text: "", tag: "" })).resolves.toEqual([]);
+    await expect(service.search({ text: " ", tag: "" })).resolves.toEqual([]);
+    await expect(service.search({ text: "a", tag: "" })).resolves.toEqual([]);
+    await expect(service.search({ text: " a ", tag: "" })).resolves.toEqual([]);
 
-    expect(repo.searchByText).not.toHaveBeenCalled();
+    expect(repo.search).not.toHaveBeenCalled();
   });
 
-  it("クエリが2文字以上ならrepo.searchByTextを呼ぶ", async () => {
+  it("クエリが2文字以上ならrepo.searchを呼ぶ", async () => {
     const dummy: Note[] = [];
-    const searchByText = vi.fn(async (_q: string) => dummy);
+    const search = vi.fn(async (_q: SearchQuery) => dummy);
     const repo: NoteRepository = {
       save: vi.fn(async () => {}),
       findAll: vi.fn(async () => []),
       findById: vi.fn(async () => null),
-      searchByText,
+      search,
     };
-    searchByText.mockResolvedValue(dummy);
+    search.mockResolvedValue(dummy);
     const service = new NoteService(repo);
 
-    await expect(service.search("ab")).resolves.toBe(dummy);
-    expect(repo.searchByText).toHaveBeenCalledTimes(1);
-    expect(repo.searchByText).toHaveBeenCalledWith("ab");
+    await expect(service.search({ text: "ab", tag: "" })).resolves.toBe(dummy);
+    expect(repo.search).toHaveBeenCalledTimes(1);
+    expect(repo.search).toHaveBeenCalledWith({ text: "ab", tag: "" });
   });
 });
