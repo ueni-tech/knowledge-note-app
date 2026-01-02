@@ -3,6 +3,7 @@ export type NoteId = string;
 export type CreateNoteParams = {
   title: string;
   body: string;
+  tags?: string[];
   now?: Date;
   idFactory?: () => NoteId;
 };
@@ -12,6 +13,7 @@ export class Note {
     public readonly id: NoteId,
     public readonly title: string,
     public readonly body: string,
+    public readonly tags: string[],
     public readonly createdAt: Date,
     public readonly updatedAt: Date
   ) {}
@@ -28,10 +30,13 @@ export class Note {
     if (title.length > 100) throw new Error("タイトルは100文字以内です");
     if (body.length > 2000) throw new Error("本文は2000文字以内です");
 
+    const rawTags = params.tags ?? [];
+    const tags = rawTags.map((t) => t.trim()).filter((t) => t.length > 0);
+
     const now = params.now ?? new Date();
     const idFactory = params.idFactory ?? defaultIdFactory;
 
-    return new Note(idFactory(), title, body, now, now);
+    return new Note(idFactory(), title, body, tags, now, now);
   }
 }
 
