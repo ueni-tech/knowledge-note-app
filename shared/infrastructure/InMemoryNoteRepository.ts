@@ -1,5 +1,5 @@
 import { Note, NoteId } from "../domain/Note";
-import { NoteRepository } from "../domain/NoteRepository";
+import { NoteRepository, SearchQuery } from "../domain/NoteRepository";
 
 /**
  * インメモリ実装（サーバ再起動で消える）
@@ -27,14 +27,22 @@ export class InMemoryNoteRepository implements NoteRepository {
     return this.notes.find((n) => n.id === id) ?? null;
   }
 
-  async searchByText(query: string): Promise<Note[]> {
-    const q = query.trim().toLowerCase();
-    if (q.length === 0) return [];
+  async search(query: SearchQuery): Promise<Note[]> {
+    const text = query.text?.trim().toLowerCase() ?? "";
+    const tag = query.tag?.trim().toLowerCase() ?? "";
+
+    if (text.length === 0 && tag.length === 0) return [];
 
     return (await this.findAll()).filter((n) => {
-      const title = n.title.toLowerCase();
-      const body = n.body.toLowerCase();
-      return title.includes(q) || body.includes(q);
+      const matchesText =
+        text.length === 0 ||
+        n.title.toLowerCase().includes(text) ||
+        n.body.toLowerCase().includes(text);
+
+      const matchesTags =
+        tag.length === 0 || n.tags.some((t) => t.toLowerCase() === tag);
+
+      return matchesText && matchesTags;
     });
   }
 }
