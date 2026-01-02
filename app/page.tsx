@@ -1,22 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 
 type NoteDto = {
   id: string;
   title: string;
   body: string;
+  tags: string[];
   createdAt: string;
   updatedAt: string;
 };
 
 type SearchTarget = "all" | "title" | "body";
 
-async function fetchNotes(q: string, target: SearchTarget): Promise<NoteDto[]> {
+async function fetchNotes(q: string, target: SearchTarget, tag: string): Promise<NoteDto[]> {
   const params = new URLSearchParams();
   if (q.trim().length > 0) params.set("q", q);
-  params.set("target", target)
+  params.set("target", target);
+  if (tag.trim().length > 0) params.set("tag", tag);
 
   const qs = params.toString();
   const url = qs.length > 0 ? `/api/notes?${qs}` : "/api/notes";
@@ -29,6 +31,7 @@ async function fetchNotes(q: string, target: SearchTarget): Promise<NoteDto[]> {
 export default function Page() {
   const [q, setQ] = useState("");
   const [target, setTarget] = useState<SearchTarget>("all");
+  const [tag, setTag] = useState("");
   const [notes, setNotes] = useState<NoteDto[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,11 +43,11 @@ export default function Page() {
     return `検索中: "${trimmed}" （target=${target}）`;
   }, [q, target]);
 
-  async function load(nextQ: string, nextTarget: SearchTarget) {
+  async function load(nextQ: string, nextTarget: SearchTarget, nextTag: string) {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchNotes(nextQ, nextTarget);
+      const data = await fetchNotes(nextQ, nextTarget, nextTag);
       setNotes(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "不明なエラー");
@@ -54,7 +57,7 @@ export default function Page() {
   }
 
   useEffect(() => {
-    void load("", "all")
+    void load("", "all", "");
   }, []);
 
   return (
@@ -102,7 +105,7 @@ export default function Page() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            void load(q, target);
+            void load(q, target, tag);
           }}
           style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <input
@@ -111,6 +114,12 @@ export default function Page() {
             placeholder="タイトル/本文を部分一致検索（2文字以上）"
             style={{ width: 360, padding: 8 }}
           />
+          <input
+            type="text"
+            onChange={(e) => setTag(e.target.value)}
+            placeholder="タグで検索"
+            style={{ width: 200, padding: 8 }}
+          />
           <button type="submit" disabled={loading}>
             検索
           </button>
@@ -118,7 +127,7 @@ export default function Page() {
             type="button"
             onClick={() => {
               setQ("");
-              void load("", target);
+              void load("", target, "");
             }}
             disabled={loading}
           >
@@ -141,6 +150,19 @@ export default function Page() {
             {notes.map((n) => (
               <li key={n.id}>
                 <strong>{n.title}</strong>
+                {n.tags.map((t) => (
+                  <span
+                    key={t}
+                    style={{
+                      display: "inline-block",
+                      background: "#e0e0e0",
+                      padding: "2px 8px",
+                      borderRadius: 4,
+                      fontSize: 12,
+                      marginRight: 4
+                    }}
+                  ></span>
+                ))}
                 <div style={{ color: "#555", fontSize: 12 }}>
                   {new Date(n.createdAt).toLocaleString()}
                 </div>
