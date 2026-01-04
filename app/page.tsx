@@ -28,7 +28,10 @@ async function fetchNotes(q: string, target: SearchTarget, tag: string): Promise
   return (await res.json()) as NoteDto[];
 }
 
-export default function Page() {
+/**
+ * 検索関連の状態とロジックを集約するカスタムフック
+ */
+function useNoteSearch() {
   const [q, setQ] = useState("");
   const [target, setTarget] = useState<SearchTarget>("all");
   const [tag, setTag] = useState("");
@@ -55,6 +58,46 @@ export default function Page() {
       setLoading(false);
     }
   }
+
+  function clear() {
+    setQ("");
+    setTag("");
+    void load("", target, "");
+  }
+
+  return {
+    q,
+    setQ,
+    target,
+    setTarget,
+    tag,
+    setTag,
+    notes,
+    error,
+    loading,
+    hint,
+    load,
+    clear,
+  }
+}
+
+export default function Page() {
+
+  const {
+    q,
+    setQ,
+    target,
+    setTarget,
+    tag,
+    setTag,
+    notes,
+    error,
+    loading,
+    hint,
+    load,
+    clear,
+  } = useNoteSearch();
+
 
   useEffect(() => {
     void load("", "all", "");
@@ -126,11 +169,7 @@ export default function Page() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setQ("");
-              setTag("")
-              void load("", target, "");
-            }}
+            onClick={clear}
             disabled={loading}
           >
             クリア
