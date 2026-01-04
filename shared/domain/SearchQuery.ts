@@ -10,7 +10,7 @@ export type SearchQuery = {
 /**
  * SearchQueryのバリデーションを正規化
  */
-export class SearchQueryValidatot {
+export class SearchQueryValidator {
   /**
    * 検索クエリが有効かどうかを判定する
    * - text/tagが両方空なら無効

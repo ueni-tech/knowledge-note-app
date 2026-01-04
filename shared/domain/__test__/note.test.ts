@@ -1,8 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 import { Note } from "../Note";
-import { NoteRepository } from "../NoteRepository";
-import { NoteService } from "../NoteService";
-import { SearchQuery } from "../SearchQuery";
 
 const fixedNow = new Date("2025-01-01T00:00:00.000Z");
 

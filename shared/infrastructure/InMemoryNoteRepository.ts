@@ -1,5 +1,6 @@
 import { Note, NoteId } from "../domain/Note";
-import { NoteRepository, SearchQuery } from "../domain/NoteRepository";
+import { NoteRepository } from "../domain/NoteRepository";
+import { SearchQuery } from "../domain/SearchQuery";
 
 /**
  * インメモリ実装（サーバ再起動で消える）
