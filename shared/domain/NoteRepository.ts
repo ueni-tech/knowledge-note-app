@@ -1,9 +1,5 @@
 import type { Note, NoteId } from "./Note";
-
-export type SearchQuery = {
-  text?: string;
-  tag?: string;
-};
+import { SearchQuery } from "./SearchQuery";
 
 /**
  * 永続化の差し替え点

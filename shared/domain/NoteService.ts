@@ -1,5 +1,6 @@
 import { Note, type CreateNoteParams } from "./Note";
-import type { NoteRepository, SearchQuery } from "./NoteRepository";
+import type { NoteRepository } from "./NoteRepository";
+import { SearchQuery, SearchQueryValidatot } from "./SearchQuery";
 
 /**
  *薄いユースケース層（domain内に置く簡易版）
@@ -19,13 +20,11 @@ export class NoteService {
   }
 
   async search(query: SearchQuery): Promise<Note[]> {
-    const text = query.text?.trim() ?? "";
-    const tag = query.tag?.trim() ?? "";
+    if (!SearchQueryValidatot.isValid(query)) {
+      return [];
+    }
 
-    if (text.length === 0 && tag.length === 0) return [];
-
-    if (text.length > 0 && text.length < 2) return [];
-
-    return await this.repo.search(query);
+    const normalize = SearchQueryValidatot.normalize(query);
+    return await this.repo.search(normalize);
   }
 }
