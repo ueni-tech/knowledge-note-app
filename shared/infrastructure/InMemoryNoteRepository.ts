@@ -40,7 +40,7 @@ export class InMemoryNoteRepository implements NoteRepository {
         n.body.toLowerCase().includes(text);
 
       const matchesTags =
-        tag.length === 0 || n.tags.some((t) => t.toLowerCase() === tag);
+        tag.length === 0 || n.tags.some((t) => t.toLowerCase().includes(tag));
 
       return matchesText && matchesTags;
     });
