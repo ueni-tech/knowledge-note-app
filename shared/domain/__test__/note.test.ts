@@ -30,6 +30,14 @@ describe("Note.create", () => {
     const texts = "a".repeat(2001);
     expect(() => Note.create({ title: "hello", body: texts })).toThrow();
   });
+
+  it("50文字以上のタグはエラー", () => {
+    const tags: string[] = [];
+    tags.push("a".repeat(51));
+    expect(() =>
+      Note.create({ title: "hello", body: "world", tags })
+    ).toThrow();
+  });
 });
 
 function createRepoMock(): NoteRepository {

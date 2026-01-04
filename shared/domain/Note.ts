@@ -32,6 +32,9 @@ export class Note {
 
     const rawTags = params.tags ?? [];
     const tags = rawTags.map((t) => t.trim()).filter((t) => t.length > 0);
+    tags.forEach((t) => {
+      if (t.length > 50) throw new Error("タグは50文字以内です");
+    });
 
     const now = params.now ?? new Date();
     const idFactory = params.idFactory ?? defaultIdFactory;

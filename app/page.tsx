@@ -148,21 +148,28 @@ export default function Page() {
         ) : (
           <ul>
             {notes.map((n) => (
-              <li key={n.id}>
+              <li key={n.id} style={{ marginBottom: 12 }}>
                 <strong>{n.title}</strong>
-                {n.tags.map((t) => (
-                  <span
-                    key={t}
-                    style={{
-                      display: "inline-block",
-                      background: "#e0e0e0",
-                      padding: "2px 8px",
-                      borderRadius: 4,
-                      fontSize: 12,
-                      marginRight: 4
-                    }}
-                  ></span>
-                ))}
+                {n.tags.length > 0 && (
+                  <div style={{ marginTop: 4 }}>
+                    {n.tags.map((t) => (
+                      <span
+                        key={t}
+                        style={{
+                          display: "inline-block",
+                          background: "#e0e0e0",
+                          padding: "2px 8px",
+                          borderRadius: 4,
+                          fontSize: 12,
+                          marginRight: 4,
+                          color: "#333"
+                        }}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div style={{ color: "#555", fontSize: 12 }}>
                   {new Date(n.createdAt).toLocaleString()}
                 </div>
