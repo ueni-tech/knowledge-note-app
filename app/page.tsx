@@ -41,7 +41,7 @@ export default function Page() {
     if (trimmed.length === 0) return "一覧を表示中";
     if (trimmed.length < 2) return "検索は2文字以上で有効";
     return `検索中: "${trimmed}" （target=${target}）`;
-  }, [q, target]);
+  }, [q, target, tag]);
 
   async function load(nextQ: string, nextTarget: SearchTarget, nextTag: string) {
     setLoading(true);
@@ -116,6 +116,7 @@ export default function Page() {
           />
           <input
             type="text"
+            value={tag}
             onChange={(e) => setTag(e.target.value)}
             placeholder="タグで検索"
             style={{ width: 200, padding: 8 }}
@@ -127,6 +128,7 @@ export default function Page() {
             type="button"
             onClick={() => {
               setQ("");
+              setTag("")
               void load("", target, "");
             }}
             disabled={loading}
@@ -162,7 +164,13 @@ export default function Page() {
                           borderRadius: 4,
                           fontSize: 12,
                           marginRight: 4,
-                          color: "#333"
+                          color: "#333",
+                          cursor: "pointer"
+                        }}
+                        onClick={() => {
+                          setQ("")
+                          setTag(t);
+                          void load(q, target, t);
                         }}
                       >
                         {t}
