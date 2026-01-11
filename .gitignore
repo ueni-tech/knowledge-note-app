@@ -1,107 +1,44 @@
-# Dependencies
-node_modules/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
 /.pnp
-.pnp.js
-.yarn/install-state.gz
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Testing
+# testing
 /coverage
-*.lcov
-.nyc_output
 
-# Next.js
+# next.js
 /.next/
 /out/
-build/
-dist/
-.next
-*.tsbuildinfo
-next-env.d.ts
 
-# Nest.js
-dist/
-build/
-*.js.map
-*.d.ts.map
-
-# Production
+# production
 /build
-/.next
-/out
 
-# Misc
+# misc
 .DS_Store
 *.pem
-*.log
+
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-lerna-debug.log*
 
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# env files (can opt-in for committing if needed)
+.env*
 
-# Local env files
-.env
-.env*.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Vercel
+# vercel
 .vercel
 
-# TypeScript
+# typescript
 *.tsbuildinfo
 next-env.d.ts
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.settings/
-*.sublime-project
-*.sublime-workspace
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-Desktop.ini
-
-# Temporary files
-*.tmp
-*.temp
-.cache/
-.temp/
-
-# AI/ML related (if using local models)
-models/
-*.model
-*.bin
-*.pt
-*.pth
-*.h5
-*.ckpt
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Uploads and user content (if storing locally)
-uploads/
-public/uploads/
-temp/
-
+# prompt
+/prompt
