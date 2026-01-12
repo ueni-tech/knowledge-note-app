@@ -73,8 +73,20 @@ export class NotesController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createNote(@Body() body: CreateNoteDto): Promise<NoteDto> {
-    if (typeof body.title !== 'string' || typeof body.body !== 'string') {
-      throw new BadRequestException('title/body は文字列で指定してください');
+    if (!body) {
+      throw new BadRequestException('リクエストボディが空です');
+    }
+
+    if (typeof body.title !== 'string' || body.title.trim().length === 0) {
+      throw new BadRequestException('titleは必須で、空文字列は許可されません');
+    }
+
+    if (typeof body.body !== 'string' || body.body.trim().length === 0) {
+      throw new BadRequestException('bodyは必須で、空文字列は許可されません');
+    }
+
+    if (body.tags !== undefined && !Array.isArray(body.tags)) {
+      throw new BadRequestException('tagは配列で指定してください');
     }
 
     const params: CreateNoteParams = {
