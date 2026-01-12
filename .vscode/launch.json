@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Nest.js API",
+      "program": "${workspaceFolder}/apps/api/dist/apps/api/src/main.js",
+      "cwd": "${workspaceFolder}/apps/api",
+      "console": "integratedTerminal",
+      "restart": true,
+      "protocol": "inspector",
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/apps/api/dist/**/*.js"
+      ],
+      "preLaunchTask": "build-nest-api"
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Nest.js",
+      "port": 9229,
+      "restart": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/apps/api/dist/**/*.js"
+      ]
+    }
+  ]
+}

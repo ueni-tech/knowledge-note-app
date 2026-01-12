@@ -8,7 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { NoteService } from '../../../../shared/domain/NoteService';
+import { NotesService } from './notes.service';
 import { SearchQuery } from '../../../../shared/domain/SearchQuery';
 import { CreateNoteParams } from '../../../../shared/domain/Note';
 
@@ -46,7 +46,7 @@ function toDto(note: any): NoteDto {
 
 @Controller('notes')
 export class NotesController {
-  constructor(private readonly notesService: NoteService) {}
+  constructor(private readonly notesService: NotesService) {}
 
   @Get()
   async getNotes(

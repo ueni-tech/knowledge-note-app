@@ -4,8 +4,18 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
+/**
+ * APIのベースURLを取得
+ */
+function getApiBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "";
+}
+
 async function createNote(title: string, body: string, tags: string[]): Promise<void> {
-  const res = await fetch("/api/notes", {
+  const baseUrl = getApiBaseUrl();
+  const apiPath = baseUrl ? `${baseUrl}/notes` : "api/notes";
+
+  const res = await fetch(apiPath, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title, body, tags }),

@@ -14,14 +14,24 @@ type NoteDto = {
 
 type SearchTarget = "all" | "title" | "body";
 
+/**
+ * APIのベースURLを取得
+ */
+function getApiBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "";
+}
+
 async function fetchNotes(q: string, target: SearchTarget, tag: string): Promise<NoteDto[]> {
+  const baseUrl = getApiBaseUrl();
+  const apiPath = baseUrl ? `${baseUrl}/notes` : "/api/notes";
+
   const params = new URLSearchParams();
   if (q.trim().length > 0) params.set("q", q);
   params.set("target", target);
   if (tag.trim().length > 0) params.set("tag", tag);
 
   const qs = params.toString();
-  const url = qs.length > 0 ? `/api/notes?${qs}` : "/api/notes";
+  const url = qs.length > 0 ? `${apiPath}?${qs}` : apiPath;
 
   const res = await fetch(url, { method: "GET" });
   if (!res.ok) throw new Error("ノートの取得に失敗しました");
