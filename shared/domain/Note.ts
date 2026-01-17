@@ -41,6 +41,29 @@ export class Note {
 
     return new Note(idFactory(), title, body, tags, now, now);
   }
+
+  /**
+   * 既存データを復元するためのメソッド
+   * 永続化層(FileNoteRepository)から呼ばれる
+   * バリデーションは行わない(既存データなので)
+   */
+  static from(data: {
+    id: NoteId;
+    title: string;
+    body: string;
+    tags: string[];
+    createdAt: Date | string;
+    updatedAt: Date | string;
+  }): Note {
+    return new Note(
+      data.id,
+      data.title,
+      data.body,
+      data.tags,
+      data.createdAt instanceof Date ? data.createdAt : new Date(data.createdAt),
+      data.updatedAt instanceof Date ? data.updatedAt : new Date(data.updatedAt)
+    );
+  }
 }
 
 function defaultIdFactory(): NoteId {
